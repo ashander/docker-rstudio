@@ -9,20 +9,13 @@ MAINTAINER Mark McCahill "mark.mccahill@duke.edu"
 RUN echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/"  >> /etc/apt/sources.list
 RUN DEBIAN_FRONTEND=noninteractive apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
 
-RUN apt-get update && \
-    apt-get upgrade -y
-
 # we want OpenBLAS for faster linear algebra as described here: http://brettklamer.com/diversions/statistical/faster-blas-in-r/
-RUN apt-get install -y \
-   libopenblas-base
-RUN apt-get update
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
-   r-base \
-   r-base-dev
-
-#Utilities
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --force-yes\
+   libopenblas-base \
+   r-base \ 
+   r-base-dev \
    vim \
    less \
    net-tools \
@@ -35,27 +28,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
    python-software-properties \
    wget \
    sudo \
-   libcurl4-openssl-dev 
-
-RUN apt-get update && \
-    apt-get upgrade -y
-
-# we need TeX for the rmarkdown package in RStudio
-
-# TeX 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+   libcurl4-openssl-dev \
    texlive \ 
    texlive-base \ 
    texlive-latex-extra \ 
    texlive-pstricks 
-
-# R-Studio
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
    gdebi-core \
-   libapparmor1
-RUN DEBIAN_FRONTEND=noninteractive wget https://s3.amazonaws.com/rstudio-dailybuilds/rstudio-server-0.99.681-amd64.deb
-RUN DEBIAN_FRONTEND=noninteractive gdebi -n rstudio-server-0.99.681-amd64.deb
-RUN rm rstudio-server-0.99.681-amd64.deb
+   libapparmor1 \
+   && apt-get clean \
+   && wget https://s3.amazonaws.com/rstudio-dailybuilds/rstudio-server-0.99.681-amd64.deb \
+   && gdebi -n rstudio-server-0.99.681-amd64.deb \
+   && rm rstudio-server-0.99.681-amd64.deb
 
 # update the R packages we will need for knitr
 RUN DEBIAN_FRONTEND=noninteractive wget \
@@ -72,10 +55,8 @@ RUN DEBIAN_FRONTEND=noninteractive wget \
    http://mirrors.nics.utk.edu/cran/src/contrib/evaluate_0.8.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/mime_0.4.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/stringi_1.0-1.tar.gz \
-   http://mirrors.nics.utk.edu/cran/src/contrib/magrittr_1.5.tar.gz
-
-
-RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
+   http://mirrors.nics.utk.edu/cran/src/contrib/magrittr_1.5.tar.gz \
+   &&  R CMD INSTALL \
    bitops_1.0-6.tar.gz \
    caTools_1.17.1.tar.gz \
    digest_0.6.9.tar.gz \
@@ -89,23 +70,8 @@ RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
    formatR_1.2.1.tar.gz \
    evaluate_0.8.tar.gz \
    markdown_0.7.7.tar.gz \
-   knitr_1.12.3.tar.gz 
-
-RUN rm \
-   evaluate_0.8.tar.gz \
-   formatR_1.2.1.tar.gz \
-   highr_0.5.1.tar.gz \
-   markdown_0.7.7.tar.gz \
-   stringi_1.0-1.tar.gz \
-   magrittr_1.5.tar.gz \
-   stringr_1.0.0.tar.gz \
    knitr_1.12.3.tar.gz \
-   yaml_2.1.13.tar.gz \
-   htmltools_0.3.tar.gz \
-   caTools_1.17.1.tar.gz \
-   bitops_1.0-6.tar.gz \
-   digest_0.6.9.tar.gz \
-   mime_0.4.tar.gz
+   && rm *.tar.gz
 
 # dependency for R XML library
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -135,9 +101,8 @@ RUN DEBIAN_FRONTEND=noninteractive wget \
    http://mirrors.nics.utk.edu/cran/src/contrib/Rcpp_0.12.3.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/plyr_1.8.3.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/XML_3.98-1.3.tar.gz \
-   http://mirrors.nics.utk.edu/cran/src/contrib/whisker_0.3-2.tar.gz
-
-RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
+   http://mirrors.nics.utk.edu/cran/src/contrib/whisker_0.3-2.tar.gz \
+   &&  R CMD INSTALL \
    jsonlite_0.9.19.tar.gz \
    memoise_1.0.0.tar.gz \
    whisker_0.3-2.tar.gz \
@@ -158,30 +123,8 @@ RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
    rversions_1.0.2.tar.gz \
    git2r_0.13.1.tar.gz \
    devtools_1.10.0.tar.gz \
-   downloader_0.4.tar.gz
-
-RUN rm \
-   jsonlite_0.9.19.tar.gz \
-   memoise_1.0.0.tar.gz \
-   whisker_0.3-2.tar.gz \
-   RCurl_1.95-4.7.tar.gz \
-   Rcpp_0.12.3.tar.gz \
-   plyr_1.8.3.tar.gz \
-   R6_2.1.2.tar.gz \
-   httr_1.1.0.tar.gz \
-   rstudioapi_0.5.tar.gz \
-   openssl_0.9.1.tar.gz \
-   withr_1.0.0.tar.gz \
-   brew_1.0-6.tar.gz \
-   roxygen2_5.0.1.tar.gz \
-   XML_3.98-1.3.tar.gz \
-   BH_1.60.0-1.tar.gz \
-   xml2_0.1.2.tar.gz \
-   curl_0.9.5.tar.gz \
-   rversions_1.0.2.tar.gz \
-   git2r_0.13.1.tar.gz \
-   devtools_1.10.0.tar.gz \
-   downloader_0.4.tar.gz
+   downloader_0.4.tar.gz \
+   && rm *.tar.gz
    
 
 # libraries Eric Green wanted
@@ -201,9 +144,8 @@ RUN DEBIAN_FRONTEND=noninteractive wget \
    http://mirrors.nics.utk.edu/cran/src/contrib/minqa_1.2.4.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/nloptr_1.0.4.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/RcppEigen_0.3.2.7.0.tar.gz \
-   http://mirrors.nics.utk.edu/cran/src/contrib/lme4_1.1-10.tar.gz
-
-RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
+   http://mirrors.nics.utk.edu/cran/src/contrib/lme4_1.1-10.tar.gz \
+   &&  R CMD INSTALL \
    lubridate_1.5.0.tar.gz  \
    gtable_0.1.2.tar.gz \
    RColorBrewer_1.1-2.tar.gz \
@@ -219,9 +161,8 @@ RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
    minqa_1.2.4.tar.gz \
    nloptr_1.0.4.tar.gz \
    RcppEigen_0.3.2.7.0.tar.gz \
-   lme4_1.1-10.tar.gz
-
-RUN rm \
+   lme4_1.1-10.tar.gz \
+   && rm \
    lubridate_1.5.0.tar.gz  \
    gtable_0.1.2.tar.gz \
    RColorBrewer_1.1-2.tar.gz \
@@ -248,10 +189,8 @@ RUN DEBIAN_FRONTEND=noninteractive wget \
    http://mirrors.nics.utk.edu/cran/src/contrib/magrittr_1.5.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/lazyeval_0.1.10.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/DBI_0.3.1.tar.gz \
-   http://mirrors.nics.utk.edu/cran/src/contrib/BH_1.60.0-1.tar.gz 
-
-
-RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
+   http://mirrors.nics.utk.edu/cran/src/contrib/BH_1.60.0-1.tar.gz \
+   &&  R CMD INSTALL \
    openintro_1.4.tar.gz \
    assertthat_0.1.tar.gz \
    R6_2.1.2.tar.gz \
@@ -259,9 +198,8 @@ RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
    lazyeval_0.1.10.tar.gz \
    DBI_0.3.1.tar.gz \
    BH_1.60.0-1.tar.gz \
-   dplyr_0.4.3.tar.gz 
-
-RUN rm \
+   dplyr_0.4.3.tar.gz \
+   && rm \
    openintro_1.4.tar.gz \
    assertthat_0.1.tar.gz \
    R6_2.1.2.tar.gz \
@@ -280,9 +218,8 @@ RUN DEBIAN_FRONTEND=noninteractive wget \
    http://mirrors.nics.utk.edu/cran/src/contrib/readr_0.2.2.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/selectr_0.2-3.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/rvest_0.3.1.tar.gz \
-   http://mirrors.nics.utk.edu/cran/src/contrib/pbkrtest_0.4-6.tar.gz 
-
-RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
+   http://mirrors.nics.utk.edu/cran/src/contrib/pbkrtest_0.4-6.tar.gz \
+   &&  R CMD INSTALL \
    chron_2.3-47.tar.gz \
    data.table_1.9.6.tar.gz \
    cellranger_1.0.0.tar.gz \
@@ -291,9 +228,8 @@ RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
    readr_0.2.2.tar.gz \
    selectr_0.2-3.tar.gz \
    rvest_0.3.1.tar.gz \
-   pbkrtest_0.4-6.tar.gz 
-
-RUN rm \
+   pbkrtest_0.4-6.tar.gz \
+   && rm \
    chron_2.3-47.tar.gz \
    data.table_1.9.6.tar.gz \
    cellranger_1.0.0.tar.gz \
@@ -318,9 +254,8 @@ RUN DEBIAN_FRONTEND=noninteractive wget \
    http://mirrors.nics.utk.edu/cran/src/contrib/broom_0.4.0.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/reshape_0.8.5.tar.gz \
    http://mirrors.nics.utk.edu/cran/src/contrib/GGally_1.0.1.tar.gz \
-   http://mirrors.nics.utk.edu/cran/src/contrib/mosaic_0.13.0.tar.gz 
-
-RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
+   http://mirrors.nics.utk.edu/cran/src/contrib/mosaic_0.13.0.tar.gz \
+   &&  R CMD INSTALL \
    SparseM_1.7.tar.gz \
    MatrixModels_0.4-1.tar.gz \
    quantreg_5.19.tar.gz \
@@ -334,9 +269,8 @@ RUN DEBIAN_FRONTEND=noninteractive R CMD INSTALL \
    broom_0.4.0.tar.gz \
    reshape_0.8.5.tar.gz \
    GGally_1.0.1.tar.gz \
-   mosaic_0.13.0.tar.gz 
-
-RUN rm \
+   mosaic_0.13.0.tar.gz \
+   && rm \
    SparseM_1.7.tar.gz \
    MatrixModels_0.4-1.tar.gz \
    quantreg_5.19.tar.gz \
@@ -354,8 +288,7 @@ RUN rm \
 
 # install rmarkdown
 ADD ./conf /r-studio
-RUN R CMD BATCH /r-studio/install-rmarkdown.R
-RUN rm /install-rmarkdown.Rout 
+RUN R CMD BATCH /r-studio/install-rmarkdown.R && rm /install-rmarkdown.Rout 
 
 # Supervisord
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor && \
@@ -364,8 +297,8 @@ CMD ["/usr/bin/supervisord", "-n"]
 
 # Config files
 RUN cd /r-studio && \
-    cp supervisord-RStudio.conf /etc/supervisor/conf.d/supervisord-RStudio.conf
-RUN rm /r-studio/*
+    cp supervisord-RStudio.conf /etc/supervisor/conf.d/supervisord-RStudio.conf \
+    && rm /r-studio/*
 
 # the default packages for everyone running R
 RUN echo "" >> /etc/R/Rprofile.site && \
